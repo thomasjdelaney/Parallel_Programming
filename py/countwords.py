@@ -1,4 +1,6 @@
 import os, sys, glob, time
+if float(sys.version[:3])<3.0:
+    execfile(os.path.join(os.environ['HOME'], '.pystartup'))
 import re
 import datetime as dt
 from functools import reduce
@@ -57,8 +59,8 @@ def print_dict(final_dict):
 
 if __name__ == "__main__":
     start_time = dt.datetime.now()
-    num_workers = int(sys.argv[1]) if 1 > len(sys.argv) else cpu_count()
-    chunk_size = int(len(shake_files)/num_workers)
+    num_workers = int(sys.argv[1]) if 1 < len(sys.argv) else cpu_count()
+    chunk_size = max(1, int(len(shake_files)/int(sys.argv[2]))) if 2 < len(sys.argv) else int(len(shake_files)/2)
     with Pool(num_workers) as pool:
         word_dict_future = pool.map_async(count_words, shake_files, chunksize = chunk_size)
         while not word_dict_future.ready():
